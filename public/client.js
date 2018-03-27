@@ -1,5 +1,5 @@
 var COLOUR =  '#505050';  // This is the drawing color
-var radius = 3;           // Constant radio for the line
+var radius = 10;           // Constant radio for the line
 var socket = io();        // websocket to the server
 var previousPosition=[0,0]; // previous position to draw a line from
 var ctx = Sketch.create(); //Creating the drawing context
@@ -16,11 +16,15 @@ var firstMessage=true;    // What the first message, to start on the first value
       ctx.clear();
     });
 
-    socket.on('new-pos', function(newPosition) { // handling new sensor values
+    socket.on('new-pos', function(data) { // handling new sensor values
 
-      //TODO: Map the incoming 10-bit numbers to the height and width of the screen.
-      // See https://github.com/soulwire/sketch.js/wiki/API for sketch references
-
+      var newPosition = [data[0],data[1]];
+      var ranValue = data[2];
+      var r = 255 - ranValue;
+      var g = 255 - Math.floor(ranValue/2);
+      var b = 255 - Math.floor(ranValue/3);
+      COLOUR = "#" + r.toString(16) + g.toString(16); + b.toString(16);
+      
       if(firstMessage){ // if its the first message store that value as previous
         firstMessage=false;
         previousPosition=newPosition;
