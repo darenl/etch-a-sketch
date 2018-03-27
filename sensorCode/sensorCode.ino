@@ -1,26 +1,36 @@
-#define SENSORPINA A0 // x axis
- //TODO: define other sensor inputs
+int xPin = A0;
+int yPin = A1;
+int xPos = 0;
+int yPos = 0;
+
+int rgbPin = A2;
+int rgb = 0;
 
 unsigned long targetTime=0;
-const unsigned long interval=2500; //TODO: How fast should we read
+const unsigned long interval=200; //TODO: How fast should we read
+int buttonPin = 4;
+int buttonState = 0;
+
 void setup(){
-// TODO: begin the serial connection with a baudrate of 115200
+	Serial.begin(115200);
+	pinMode(buttonPin, INPUT);
 }
 
 
 void loop(){
 	if(millis()>=targetTime){
-		targetTime= millis()+interval;
-		Serial.println(analogRead(SENSORPINA));
-
-		 //TODO: Add other sensor read outs
-     //TODO: convert values into a string https://www.arduino.cc/en/Tutorial/StringConstructors
-		 //TODO: combine them into a string that can be understood by server.js
-		 //TODO: send the string over serial
-
-
+		buttonState = digitalRead(buttonPin);
+		if(buttonState == HIGH){
+			Serial.println("rst");
+		}
+		else{
+			xPos = analogRead(xPin);
+			yPos = analogRead(yPin);
+			rgb = analogRead(rgbPin);
+			rgb = map(rgb, 0, 1023, 0, 255);
+			String data = String(xPos) + "," + String(yPos) + "," + String(rgb) + "\r\n";
+			Serial.println(data);
+		}
+		targetTime = millis() + interval;
 	}
-	// TODO: Detect if you want to reset the screen(shake the etch-a-sketch)
-  // TODO: write the reset message(see server.js) to the serial port
-
 }
